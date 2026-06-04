@@ -1,0 +1,100 @@
+<div class="flex h-screen overflow-hidden bg-gray-50">
+  <!-- Sidebar -->
+  <aside class="w-52 bg-white flex flex-col min-h-screen shrink-0 border-r border-gray-200">
+    <div class="px-4 py-5 border-b border-gray-200">
+      <div class="flex items-center gap-2.5">
+        <img
+          src="assets/afa90946107debb396ffdb7284683a17-1.jpg"
+          alt="Campus Logo"
+          class="w-8 h-8 object-contain"
+        />
+        <div>
+          <p class="text-gray-900 font-semibold text-sm leading-tight" style="font-family: 'Outfit', sans-serif;">Campus</p>
+          <p class="text-cyan-600 text-[10px] leading-tight">Lost &amp; Found</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 overflow-y-auto px-2 py-3 space-y-4">
+      <div *ngFor="let section of sections">
+        <p class="text-[9px] font-semibold text-gray-400 tracking-widest px-3 mb-1.5">{{ section.label }}</p>
+        <div class="space-y-0.5">
+          <button
+            *ngFor="let item of section.items"
+            [routerLink]="item.path"
+            routerLinkActive="bg-cyan-600 text-white"
+            [routerLinkActiveOptions]="{ exact: false }"
+            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-all text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+            style="font-family: 'DM Sans', sans-serif;"
+          >
+            <!-- SVG icons directly matched to each item.id -->
+            <ng-container [ngSwitch]="item.id">
+              <svg *ngSwitchCase="'lost-items'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <svg *ngSwitchCase="'found-items'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+              <svg *ngSwitchCase="'expired-items'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+              </svg>
+              <svg *ngSwitchCase="'upload-item'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <svg *ngSwitchCase="'history'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <svg *ngSwitchCase="'guidelines'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <svg *ngSwitchCase="'settings'" class="w-[15px] h-[15px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </ng-container>
+            {{ item.label }}
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Footer user card -->
+    <div class="p-3 border-t border-gray-200">
+      <div class="flex items-center gap-2.5 px-2 py-2">
+        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0">
+          {{ getInitials() }}
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-gray-900 text-xs font-medium truncate" style="font-family: 'Outfit', sans-serif;">
+            {{ currentUser?.fullName || 'Admin' }}
+          </p>
+          <p class="text-gray-500 text-[10px] truncate">
+            {{ currentUser?.email || 'admin@campus.edu' }}
+          </p>
+        </div>
+        <button
+          (click)="openLogoutModal()"
+          title="Logout"
+          class="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 hover:shadow-sm transition-all duration-150"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Page Content Area -->
+  <div class="flex-1 flex flex-col min-w-0">
+    <router-outlet></router-outlet>
+  </div>
+
+  <!-- Logout Confirmation Overlay -->
+  <ds-logout-modal
+    *ngIf="showLogoutModal"
+    (confirm)="confirmLogout()"
+    (close)="closeLogoutModal()"
+  ></ds-logout-modal>
+</div>

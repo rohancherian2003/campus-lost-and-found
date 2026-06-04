@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: campus_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - campus_network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: campus_backend
+    ports:
+      - "8080:8080"
+    environment:
+      - HTTP_PORT=8080
+      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_DATABASE=campus_lost_found
+      - CORS_ORIGIN=http://localhost:4200
+      # Pass the host's JWT_SECRET down to the container securely.
+      # The validation logic in AppConfig will fail if the host doesn't define it.
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_SEED_PASSWORD=${ADMIN_SEED_PASSWORD}
+    depends_on:
+      - mongodb
+    networks:
+      - campus_network
+
+volumes:
+  mongo_data:
+
+networks:
+  campus_network:
+    driver: bridge

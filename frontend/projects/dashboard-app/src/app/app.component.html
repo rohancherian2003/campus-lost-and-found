@@ -1,0 +1,5 @@
+<ng-container [ngSwitch]="activeView">
+  <app-history *ngSwitchCase="'history'"></app-history>
+  <app-guidelines *ngSwitchCase="'guidelines'"></app-guidelines>
+  <app-settings *ngSwitchCase="'settings'"></app-settings>
+</ng-container>

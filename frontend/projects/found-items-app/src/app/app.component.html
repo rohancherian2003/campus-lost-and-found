@@ -1,0 +1,663 @@
+<ng-container [ngSwitch]="activeView">
+
+  <!-- ── VIEW 1: Found Items List ──────────────────────────────────────── -->
+  <main *ngSwitchCase="'found'" class="flex-1 overflow-y-auto px-5 py-4 bg-gray-50">
+    <div class="mb-4">
+      <h1 class="text-xl font-bold text-gray-900" style="font-family: 'Outfit', sans-serif">Found Items</h1>
+      <p class="text-gray-600 text-sm" style="font-family: 'DM Sans', sans-serif">Manage all found items reported on campus</p>
+    </div>
+
+    <!-- Countdown Summary -->
+    <ds-countdown-summary [items]="items" dateField="dateFound"></ds-countdown-summary>
+
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <!-- Search Input -->
+        <div class="relative md:col-span-2">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            placeholder="Search by name, location, or date…"
+            [formControl]="searchControl"
+            class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+            style="font-family: 'DM Sans', sans-serif;"
+          />
+        </div>
+
+        <!-- Location Input -->
+        <div class="relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </span>
+          <input
+            type="text"
+            placeholder="Filter by location..."
+            [formControl]="locationControl"
+            class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+            style="font-family: 'DM Sans', sans-serif;"
+          />
+        </div>
+      </div>
+
+      <!-- Countdown filters -->
+      <div class="mt-3 flex items-center gap-3 flex-wrap">
+        <span class="text-xs text-gray-500 font-medium shrink-0" style="font-family: 'DM Sans', sans-serif;">Countdown:</span>
+        <button
+          *ngFor="let opt of [
+            { value: '', label: 'All' },
+            { value: 'active', label: '🟢 Active' },
+            { value: 'expiring', label: '🟡 Expiring Soon' },
+            { value: 'last10', label: '🔴 Last 10 Days' }
+          ]"
+          (click)="handleCountdownFilter(opt.value)"
+          class="px-2.5 py-1 rounded-lg text-xs font-medium transition-colors"
+          [ngClass]="filterCountdown === opt.value ? 'bg-cyan-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+          style="font-family: 'DM Sans', sans-serif;"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
+
+      <div class="mt-2 text-xs text-gray-500" style="font-family: 'DM Sans', sans-serif;">
+        {{ totalRecords }} item{{ totalRecords !== 1 ? 's' : '' }} found · sorted by newest first
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-4">
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50">
+              <th *ngFor="let h of ['Name', 'Reported Date & Time', 'Location', 'Storage Office', 'Days Left', 'Actions']"
+                  class="px-4 py-3 text-left text-gray-600 font-semibold text-[11px] uppercase tracking-wide whitespace-nowrap"
+                  style="font-family: 'DM Sans', sans-serif;">
+                {{ h }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="pageItems.length === 0">
+              <td colSpan="6" class="px-4 py-10 text-center text-gray-500 text-sm" style="font-family: 'DM Sans', sans-serif;">
+                No items found matching your search criteria
+              </td>
+            </tr>
+            <tr
+              *ngFor="let item of pageItems; let i = index; trackBy: trackByItemId"
+              [ngClass]="i % 2 !== 0 ? 'bg-gray-50/40' : ''"
+              class="border-b border-gray-100 hover:bg-cyan-50/30 transition-colors"
+            >
+              <!-- Name -->
+              <td class="px-4 py-3 text-gray-900 font-medium whitespace-nowrap truncate max-w-[180px]" [title]="item.name" style="font-family: 'DM Sans', sans-serif;">
+                {{ item.name }}
+              </td>
+              <!-- Date & Time -->
+              <td class="px-4 py-3 whitespace-nowrap">
+                <div class="text-gray-700" *ngIf="item.reportedAt">{{ formatDate(item.reportedAt, true).split(', ')[0] }}</div>
+                <div class="text-gray-400 text-[10px]" *ngIf="item.reportedAt && formatDate(item.reportedAt, true).includes(', ')">{{ formatDate(item.reportedAt, true).split(', ')[1] }}</div>
+              </td>
+              <!-- Location -->
+              <td class="px-4 py-3 text-gray-600 max-w-[130px]">
+                <span class="truncate block">{{ item.location }}</span>
+              </td>
+              <!-- Storage Office -->
+              <td class="px-4 py-3 text-emerald-600 font-semibold truncate max-w-[130px]">
+                {{ item.collectFrom }}
+              </td>
+              <!-- Days Left -->
+              <td class="px-4 py-3">
+                <ds-countdown-chip [dateStr]="item.dateFound"></ds-countdown-chip>
+              </td>
+              <!-- Actions -->
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <button (click)="openEditModal(item)" class="text-cyan-600 hover:text-cyan-700 p-1 rounded hover:bg-cyan-50 transition-colors" title="Edit Status">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button (click)="pendingDeleteId = item._id || null" class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 border border-transparent hover:border-red-200 transition-all duration-150" title="Delete">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <ds-pagination
+        [totalRecords]="totalRecords"
+        [currentPage]="currentPage"
+        [rowsPerPage]="rowsPerPage"
+        [showRowsPerPage]="true"
+        (pageChange)="onPageChange($event)"
+        (rowsPerPageChange)="onRowsPerPageChange($event)"
+      ></ds-pagination>
+    </div>
+
+    <!-- Edit Status & Claimant Details Dialog -->
+    <div *ngIf="editItem" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-2xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-lg font-bold text-gray-900 mb-1" style="font-family: 'Outfit', sans-serif">Edit Item Status</h2>
+        <p class="text-xs text-gray-400 mb-4" style="font-family: 'DM Sans', sans-serif">Changing to "Returned" requires filling out owner details</p>
+        
+        <div class="space-y-4">
+          <!-- Item info (Read-only) -->
+          <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 flex items-center gap-2">
+            <span class="text-xs text-gray-500" style="font-family: 'DM Sans', sans-serif">Item:</span>
+            <span class="text-sm font-semibold text-gray-900" style="font-family: 'DM Sans', sans-serif">{{ editItem.name }}</span>
+          </div>
+
+          <!-- Status selection -->
+          <div>
+            <label class="text-xs font-semibold text-gray-600 block mb-1.5" style="font-family: 'DM Sans', sans-serif">Status <span class="text-red-400">*</span></label>
+            <select
+              [(ngModel)]="editStatus"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+              style="font-family: 'DM Sans', sans-serif;"
+            >
+              <option value="Not Returned">Not Returned</option>
+              <option value="Returned">Returned</option>
+            </select>
+          </div>
+
+          <!-- Claimant Form (Only if editStatus === 'Returned') -->
+          <div *ngIf="editStatus === 'Returned'" class="pt-3 border-t border-gray-100 space-y-4">
+            <p class="text-xs font-bold text-cyan-600 uppercase tracking-widest" style="font-family: 'DM Sans', sans-serif;">Claimant Information</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-semibold text-gray-500 block mb-1">Student Name *</label>
+                <input type="text" [(ngModel)]="editStudentName" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Student Name" />
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-gray-500 block mb-1">Roll Number *</label>
+                <input type="text" [(ngModel)]="editRollNo" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="e.g. STU-2024-001" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-semibold text-gray-500 block mb-1">Phone *</label>
+                <input type="text" [(ngModel)]="editPhone" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Phone Number" />
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-gray-500 block mb-1">Email *</label>
+                <input type="email" [(ngModel)]="editEmail" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Email Address" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="text-xs font-semibold text-gray-500 block mb-1">Returned Date *</label>
+                <input type="date" [(ngModel)]="editReturnedDate" [max]="todayDate" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" />
+              </div>
+              <div>
+                <label class="text-xs font-semibold text-gray-500 block mb-1">Returned Time *</label>
+                <input type="time" [(ngModel)]="editReturnedTime" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" />
+              </div>
+            </div>
+
+            <div>
+              <label class="text-xs font-semibold text-gray-500 block mb-1">Remarks</label>
+              <textarea [(ngModel)]="editRemarks" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 resize-none" placeholder="Remarks..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-5">
+          <button (click)="editItem = null" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-sm transition-colors" style="font-family: 'DM Sans', sans-serif">Cancel</button>
+          <button
+            (click)="handleSaveEdit()"
+            [disabled]="!isReturnFormValid()"
+            class="flex-1 px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-700 font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style="font-family: 'DM Sans', sans-serif"
+          >
+            {{ editStatus === 'Returned' ? 'Continue →' : 'Save Changes' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Return Modal -->
+    <ds-return-modal
+      *ngIf="pendingReturnItem"
+      [itemName]="pendingReturnItem.name"
+      [itemId]="pendingReturnItem.itemId"
+      itemType="Found Item"
+      (confirm)="confirmReturn()"
+      (close)="pendingReturnItem = null"
+    ></ds-return-modal>
+
+    <!-- Confirm Delete Modal -->
+    <ds-delete-modal
+      *ngIf="pendingDeleteId"
+      [itemName]="getPendingDeleteName()"
+      [itemId]="getPendingDeleteItemId()"
+      itemType="Found Item"
+      title="Delete Found Item"
+      message="Are you sure you want to delete this item?"
+      (confirm)="confirmDelete()"
+      (close)="pendingDeleteId = null"
+    ></ds-delete-modal>
+  </main>
+
+  <!-- ── VIEW 2: Expired Items Disposal ────────────────────────────────── -->
+  <main *ngSwitchCase="'expired'" class="flex-1 overflow-y-auto px-5 py-4 bg-gray-50">
+    <div class="mb-4">
+      <div class="flex items-center gap-2 mb-1">
+        <svg class="text-gray-500 w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+        </svg>
+        <h1 class="text-xl font-bold text-gray-900" style="font-family: 'Outfit', sans-serif">Expired Items – Awaiting Disposal</h1>
+      </div>
+      <p class="text-gray-600 text-sm" style="font-family: 'DM Sans', sans-serif">Items unclaimed for 60+ days. Mark each item as disposed and optionally donate to a social service club.</p>
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="border rounded-xl p-4 flex items-center gap-3 bg-gray-50 border-gray-200">
+        <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-gray-500"></span>
+        <div>
+          <p class="text-2xl font-bold text-gray-700" style="font-family: 'Outfit', sans-serif">{{ expiredItems.length }}</p>
+          <p class="text-[10px] font-semibold text-gray-700" style="font-family: 'DM Sans', sans-serif">Total Expired</p>
+        </div>
+      </div>
+      <div class="border rounded-xl p-4 flex items-center gap-3 bg-emerald-50 border-emerald-200">
+        <span class="w-2.5 h-2.5 rounded-full shrink-0 bg-emerald-500"></span>
+        <div>
+          <p class="text-2xl font-bold text-emerald-700" style="font-family: 'Outfit', sans-serif">{{ expiredItems.length }}</p>
+          <p class="text-[10px] font-semibold text-emerald-700" style="font-family: 'DM Sans', sans-serif">Found Items</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-4">
+      <div class="relative max-w-md">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </span>
+        <input
+          type="text"
+          placeholder="Search by name, location..."
+          [formControl]="searchControl"
+          class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+        />
+      </div>
+    </div>
+
+    <!-- Expired Items Table -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-gray-200 bg-gray-50">
+              <th *ngFor="let h of ['Item Name', 'Reported Date', 'Location', 'Days Unclaimed', 'Actions']"
+                  class="px-4 py-3 text-left text-gray-600 font-semibold text-[11px] uppercase tracking-wide whitespace-nowrap"
+                  style="font-family: 'DM Sans', sans-serif;">
+                {{ h }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="expiredItems.length === 0">
+              <td colSpan="5" class="px-4 py-10 text-center text-gray-500 text-sm">
+                No expired items found.
+              </td>
+            </tr>
+            <tr
+              *ngFor="let item of expiredItems; let i = index; trackBy: trackByItemId"
+              [ngClass]="i % 2 !== 0 ? 'bg-gray-50/40' : ''"
+              class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <td class="px-4 py-3 font-semibold text-gray-900 whitespace-nowrap" style="font-family: 'DM Sans', sans-serif;">
+                {{ item.name }}
+              </td>
+              <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ formatDate(item.dateFound) }}</td>
+              <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ item.location }}</td>
+              <td class="px-4 py-3 text-gray-600 whitespace-nowrap">{{ getDaysElapsed(item.dateFound) }} days</td>
+              <td class="px-4 py-3">
+                <button
+                  (click)="openDisposalModal(item)"
+                  class="px-3 py-1 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Dispose
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Expired Items Pagination -->
+      <ds-pagination
+        [totalRecords]="totalExpiredRecords"
+        [currentPage]="currentPage"
+        [rowsPerPage]="rowsPerPage"
+        [showRowsPerPage]="true"
+        [rowOptions]="[10, 25, 50]"
+        (pageChange)="onExpiredPageChange($event)"
+        (rowsPerPageChange)="onExpiredRowsPerPageChange($event)"
+      ></ds-pagination>
+    </div>
+
+    <!-- Expired Item Disposal Modal -->
+    <div *ngIf="selectedExpiredItem" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-2xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+        <h2 class="text-lg font-bold text-gray-900 mb-1" style="font-family: 'Outfit', sans-serif">Dispose Item</h2>
+        <p class="text-xs text-gray-400 mb-4" style="font-family: 'DM Sans', sans-serif">Choose action to dispose this unclaimed found item</p>
+
+        <div class="space-y-4">
+          <!-- Item details -->
+          <div class="bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex flex-col gap-0.5">
+            <span class="text-[10px] text-red-700 uppercase font-bold tracking-wide">Expired Item</span>
+            <span class="text-sm font-semibold text-red-900">{{ selectedExpiredItem.name }}</span>
+            <span class="text-xs text-gray-500">Unclaimed for {{ getDaysElapsed(selectedExpiredItem.dateFound) }} days</span>
+          </div>
+
+          <!-- Disposal Location Input -->
+          <div>
+            <label class="text-xs font-semibold text-gray-600 block mb-1">Disposal / Storage Location *</label>
+            <input type="text" [(ngModel)]="disposalLocation" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="e.g. NSS Store room, Main Office bin" />
+          </div>
+
+          <!-- Donation Option -->
+          <div>
+            <label class="text-xs font-semibold text-gray-600 block mb-1">Donate to Social Service Club</label>
+            <select [(ngModel)]="donatedTo" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20">
+              <option value="None">None (Discard / Scrap)</option>
+              <option *ngFor="let club of socialClubs" [value]="club">{{ club }}</option>
+            </select>
+          </div>
+
+          <!-- Notes -->
+          <div>
+            <label class="text-xs font-semibold text-gray-600 block mb-1">Disposal Notes</label>
+            <textarea [(ngModel)]="disposalNotes" rows="2" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 resize-none" placeholder="Add optional details..."></textarea>
+          </div>
+
+          <!-- Double Confirm Checklist -->
+          <div class="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+            <input type="checkbox" [(ngModel)]="showDisposalConfirm" id="dispConfirm" class="mt-0.5 w-4 h-4 text-cyan-600 border-gray-300 rounded focus:ring-cyan-500" />
+            <label for="dispConfirm" class="text-amber-800 text-[11px] leading-normal select-none">
+              I confirm this item is older than 60 days and is eligible for campus recycling/disposal policies.
+            </label>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-5">
+          <button (click)="selectedExpiredItem = null" class="flex-1 px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-sm transition-colors" style="font-family: 'DM Sans', sans-serif">Cancel</button>
+          <button
+            (click)="submitDisposal()"
+            [disabled]="!disposalLocation.trim() || !showDisposalConfirm"
+            class="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            style="font-family: 'DM Sans', sans-serif"
+          >
+            Mark Disposed
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── VIEW 3: Report / Upload Item Form ──────────────────────────────── -->
+  <main *ngSwitchCase="'report'" class="flex-1 overflow-y-auto bg-gray-50">
+    <div *ngIf="reportSubmitted" class="flex-1 flex flex-col items-center justify-center bg-gray-50 p-8 min-h-[80vh]">
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-xl p-10 max-w-md w-full text-center">
+        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" [ngClass]="reportItemType === 'lost' ? 'bg-amber-100' : 'bg-emerald-100'">
+          <svg class="w-8 h-8" [ngClass]="reportItemType === 'lost' ? 'text-amber-500' : 'text-emerald-500'" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h2 class="text-gray-900 text-xl font-bold mb-2" style="font-family: 'Outfit', sans-serif">
+          Item Reported Successfully!
+        </h2>
+        <p class="text-gray-600 text-sm mb-1" style="font-family: 'DM Sans', sans-serif">
+          <span class="font-semibold text-gray-900">{{ reportForm.name || 'The item' }}</span> has been added to the system.
+        </p>
+        <p class="text-gray-600 text-sm mb-1" style="font-family: 'DM Sans', sans-serif" *ngIf="reportForm.studentName || reportForm.staffName">
+          {{ reportItemType === 'lost' ? "We'll contact" : 'Contact on file:' }} <span class="font-semibold text-gray-900">{{ reportContactType === 'student' ? reportForm.email : reportForm.staffEmail }}</span>{{ reportItemType === 'lost' ? ' if your item is found.' : '.' }}
+        </p>
+        <p class="text-gray-600 text-sm mb-6" style="font-family: 'DM Sans', sans-serif" *ngIf="reportForm.collectFrom && reportItemType === 'found'">
+          Students can collect it from <span class="font-semibold text-gray-900">{{ reportForm.collectFrom }}</span>.
+        </p>
+        <button
+          (click)="cancelReport()"
+          class="w-full py-2.5 rounded-xl font-semibold text-sm transition-all text-white"
+          [ngClass]="reportItemType === 'lost' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'"
+          style="font-family: 'DM Sans', sans-serif;"
+        >
+          Back to Dashboard
+        </button>
+      </div>
+    </div>
+
+    <form *ngIf="!reportSubmitted" (submit)="handleReportSubmit($event)" class="max-w-2xl mx-auto px-6 py-8">
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        
+        <!-- Form Header -->
+        <div class="px-6 py-5 border-b border-gray-200">
+          <p class="text-gray-900 font-semibold text-base mb-3" style="font-family: 'Outfit', sans-serif;">Report an Item</p>
+          
+          <!-- Lost / Found Toggle -->
+          <div class="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1">
+            <button
+              type="button"
+              (click)="handleTypeSwitch('lost')"
+              class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              [ngClass]="reportItemType === 'lost' ? 'bg-amber-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+              style="font-family: 'DM Sans', sans-serif;"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              Lost Item
+            </button>
+            <button
+              type="button"
+              (click)="handleTypeSwitch('found')"
+              class="flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+              [ngClass]="reportItemType === 'found' ? 'bg-emerald-500 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+              style="font-family: 'DM Sans', sans-serif;"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Found Item
+            </button>
+          </div>
+          <p class="text-gray-400 text-[11px] mt-2" style="font-family: 'DM Sans', sans-serif;">
+            Fill in the details below. All fields marked * are required.
+          </p>
+        </div>
+
+        <!-- Form Body -->
+        <div class="p-6 space-y-5">
+          <!-- Item Name -->
+          <div>
+            <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">Item Name *</label>
+            <input required type="text" [(ngModel)]="reportForm.name" name="name" [placeholder]="reportItemType === 'lost' ? 'e.g. Black Leather Wallet' : 'e.g. Blue Nike Backpack'" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" />
+          </div>
+
+          <!-- Location + Date Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">{{ reportItemType === 'lost' ? 'Last Seen Location' : 'Location Found' }} *</label>
+              <input required type="text" [(ngModel)]="reportForm.location" name="location" [placeholder]="reportItemType === 'lost' ? 'e.g. Library 2nd Floor' : 'e.g. Main Cafeteria'" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" />
+            </div>
+            <div>
+              <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">{{ reportItemType === 'lost' ? 'Date Lost' : 'Date Found' }} *</label>
+              <input required type="date" [(ngModel)]="reportForm.date" name="date" [max]="todayDate" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20" style="color-scheme: light;" />
+            </div>
+          </div>
+
+          <!-- Where to Receive From (Found Items only) -->
+          <div *ngIf="reportItemType === 'found'">
+            <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">Where to Receive From *</label>
+            <select required [(ngModel)]="reportForm.collectFrom" name="collectFrom" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 appearance-none cursor-pointer">
+              <option value="" disabled>Select reception/office</option>
+              <option *ngFor="let o of collectFromOptions" [value]="o">{{ o }}</option>
+            </select>
+          </div>
+
+          <!-- Category Selection -->
+          <div>
+            <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">Category *</label>
+            <select required [(ngModel)]="reportForm.image" name="category" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 appearance-none cursor-pointer">
+              <option value="" disabled>Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
+            </select>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">Description *</label>
+            <textarea required rows="4" [(ngModel)]="reportForm.description" name="description" placeholder="Describe the item clearly — colour, size, distinguishing marks..." class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 resize-none"></textarea>
+          </div>
+
+          <!-- Contact Details Split -->
+          <div class="pt-4 border-t border-gray-200">
+            <div>
+              <p class="text-gray-900 font-semibold text-sm" style="font-family: 'Outfit', sans-serif">Contact Details</p>
+              <p class="text-gray-500 text-xs mt-0.5" style="font-family: 'DM Sans', sans-serif">
+                {{ reportItemType === 'lost' ? 'To contact if item is found' : 'Reporter contact information' }}
+              </p>
+            </div>
+
+            <!-- Tab switcher student/staff -->
+            <div class="inline-flex rounded-xl border border-gray-200 bg-gray-50 p-1 mt-3">
+              <button
+                type="button"
+                (click)="reportContactType = 'student'"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200"
+                [ngClass]="reportContactType === 'student' ? 'bg-cyan-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+              >
+                Student Contact Details
+              </button>
+              <button
+                type="button"
+                (click)="reportContactType = 'staff'"
+                class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200"
+                [ngClass]="reportContactType === 'staff' ? 'bg-cyan-600 text-white shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+              >
+                Staff Contact Details
+              </button>
+            </div>
+          </div>
+
+          <!-- Student Fields -->
+          <div *ngIf="reportContactType === 'student'" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Student Name *</label>
+                <input required type="text" [(ngModel)]="reportForm.studentName" name="studentName" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Full Name" />
+              </div>
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Roll Number *</label>
+                <input required type="text" [(ngModel)]="reportForm.rollNo" name="rollNo" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="e.g. STU-2024-001" />
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Phone Number *</label>
+                <input required type="tel" [(ngModel)]="reportForm.phone" name="phone" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Phone" />
+              </div>
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Email Address *</label>
+                <input required type="email" [(ngModel)]="reportForm.email" name="email" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Email" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Staff Fields -->
+          <div *ngIf="reportContactType === 'staff'" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Staff Name *</label>
+                <input required type="text" [(ngModel)]="reportForm.staffName" name="staffName" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Full Name" />
+              </div>
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Employee ID *</label>
+                <input required type="text" [(ngModel)]="reportForm.employeeId" name="employeeId" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="e.g. EMP-2024-001" />
+              </div>
+            </div>
+            <div>
+              <label class="text-gray-700 text-xs block mb-1">Department *</label>
+              <input required type="text" [(ngModel)]="reportForm.department" name="department" class="w-full border rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="e.g. Library, Engineering" />
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Phone Number *</label>
+                <input required type="tel" [(ngModel)]="reportForm.staffPhone" name="staffPhone" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Phone" />
+              </div>
+              <div>
+                <label class="text-gray-700 text-xs block mb-1">Email Address *</label>
+                <input required type="email" [(ngModel)]="reportForm.staffEmail" name="staffEmail" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20" placeholder="Email" />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Form Footer Actions -->
+        <div class="px-6 pb-6 flex gap-3">
+          <button
+            type="button"
+            (click)="cancelReport()"
+            class="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-medium transition-all"
+            style="font-family: 'DM Sans', sans-serif;"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="flex-1 py-2.5 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 text-white"
+            [ngClass]="reportItemType === 'lost' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600'"
+            style="font-family: 'DM Sans', sans-serif;"
+          >
+            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Report {{ reportItemType === 'lost' ? 'Lost' : 'Found' }} Item
+          </button>
+        </div>
+      </div>
+    </form>
+  </main>
+
+</ng-container>
+
+<!-- Floating Toast Notifications -->
+<div
+  *ngIf="toastMessage"
+  class="fixed bottom-6 right-6 z-50 bg-emerald-600 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 transition-all duration-300 transform translate-y-0"
+  style="font-family: 'DM Sans', sans-serif;"
+>
+  <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+    <svg class="text-white w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  </div>
+  <div>
+    <p class="font-bold text-xs">{{ toastMessage }}</p>
+    <p class="text-[10px] opacity-90">{{ toastDescription }}</p>
+  </div>
+</div>

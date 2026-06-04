@@ -1,0 +1,159 @@
+<div class="min-h-screen flex flex-col" style="background: #f0f4f8;">
+  <!-- Back to Home -->
+  <div class="px-8 pt-7 pb-2">
+    <button
+      (click)="navigateBack()"
+      class="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm transition-colors font-medium"
+      style="font-family: 'DM Sans', sans-serif;"
+    >
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Home
+    </button>
+  </div>
+
+  <!-- Centered Card -->
+  <div class="flex-1 flex items-start justify-center px-4 pt-6 pb-12">
+    <div
+      class="w-full overflow-hidden"
+      style="max-width: 520px; border-radius: 20px; box-shadow: 0 8px 40px #0000001a, 0 2px 12px #00000010; background: linear-gradient(160deg, #cef3f8 0%, #e8fafc 18%, #ffffff 45%);"
+    >
+      <!-- Inner padded content -->
+      <div class="px-10 pt-12 pb-10">
+        <!-- Logo -->
+        <div class="flex justify-center mb-8">
+          <img
+            src="assets/KJUSYS2-1.png"
+            alt="Kristu Jayanti University"
+            class="h-12 object-contain"
+          />
+        </div>
+
+        <!-- Heading -->
+        <div class="text-center mb-7">
+          <h1
+            class="text-gray-900 mb-1"
+            style="font-family: 'Outfit', sans-serif; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.01em;"
+          >
+            Admin Login
+          </h1>
+          <p class="text-gray-500 text-sm" style="font-family: 'DM Sans', sans-serif;">
+            Sign in to access the admin dashboard
+          </p>
+        </div>
+
+        <!-- Form -->
+        <form (onSubmit)="handleSubmit($event)" (submit)="handleSubmit($event)" class="space-y-4">
+          <!-- Email -->
+          <div>
+            <label
+              class="block text-sm text-gray-800 mb-2"
+              style="font-family: 'DM Sans', sans-serif; font-weight: 500;"
+            >
+              Email Address
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                required
+                [ngModel]="email"
+                (ngModelChange)="handleEmailChange($event)"
+                name="email"
+                placeholder="Enter your email"
+                class="w-full pl-11 pr-4 py-3 text-sm bg-white border border-gray-200 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                style="font-family: 'DM Sans', sans-serif;"
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label
+              class="block text-sm text-gray-800 mb-2"
+              style="font-family: 'DM Sans', sans-serif; font-weight: 500;"
+            >
+              Password
+            </label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </span>
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                required
+                [(ngModel)]="password"
+                name="password"
+                placeholder="Enter your password"
+                class="w-full pl-11 pr-11 py-3 text-sm bg-white border border-gray-200 rounded-full text-gray-900 placeholder-gray-400 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all"
+                style="font-family: 'DM Sans', sans-serif;"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility()"
+                [title]="showPassword ? 'Hide Password' : 'Show Password'"
+                class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-full transition-colors duration-150 hover:bg-cyan-50 active:scale-90"
+                [style.color]="showPassword ? '#0891b2' : '#64748b'"
+              >
+                <svg *ngIf="showPassword" class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                <svg *ngIf="!showPassword" class="w-[17px] h-[17px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sign In Button -->
+          <div class="pt-1">
+            <button
+              type="submit"
+              [disabled]="isSubmitting"
+              class="w-full py-3 rounded-full text-white text-sm font-semibold transition-all duration-200 hover:opacity-90 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+              style="background: #0891b2; font-family: 'DM Sans', sans-serif; font-size: 0.95rem;"
+            >
+              <span *ngIf="!isSubmitting">Sign In</span>
+              <span *ngIf="isSubmitting">Signing In...</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Credentials hint / Validation / Error -->
+        <div
+          class="mt-6 rounded-2xl p-4 transition-all duration-200"
+          [style.background]="error ? '#fff1f2' : (validationMsg ? '#fffbeb' : '#f0f9ff')"
+          [style.border]="error ? '1px solid #fecdd3' : (validationMsg ? '1px solid #fde68a' : '1px solid #e0f2fe')"
+        >
+          <div *ngIf="error" class="flex items-start gap-2">
+            <svg class="text-red-500 mt-0.5 shrink-0 w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-sm text-red-700" style="font-family: 'DM Sans', sans-serif;">{{ error }}</p>
+          </div>
+          
+          <div *ngIf="!error && validationMsg" class="flex items-start gap-2">
+            <svg class="text-amber-500 mt-0.5 shrink-0 w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p class="text-sm text-amber-800" style="font-family: 'DM Sans', sans-serif;">{{ validationMsg }}</p>
+          </div>
+
+          <p *ngIf="!error && !validationMsg" class="text-sm text-gray-700 leading-relaxed" style="font-family: 'DM Sans', sans-serif;">
+            <span class="font-bold text-gray-800">Admin Credentials:</span><br />
+            Email: admin@campus.edu<br />
+            Password: admin123
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,340 @@
+<div class="h-screen overflow-y-auto" style="scroll-snap-type: y mandatory;">
+
+  <!-- ── SECTION 1 — Hero (full viewport) ─────────────────── -->
+  <section class="relative min-h-screen flex flex-col bg-white" style="scroll-snap-align: start;">
+    
+    <!-- Blobs -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute top-0 left-0 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob"></div>
+      <div class="absolute bottom-0 right-0 w-80 h-80 bg-teal-200 rounded-full mix-blend-multiply blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="relative shrink-0 bg-white/80 backdrop-blur border-b border-slate-200 shadow-sm z-10">
+      <div class="max-w-6xl mx-auto px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="assets/WhatsApp_Image_2026-06-01_at_10.51.49_AM.jpeg" alt="Kristu Jayanti University" class="h-8 object-contain" />
+          <div class="border-l-2 border-slate-200 pl-3">
+            <p class="text-slate-900 font-bold text-base leading-tight" style="font-family: 'Outfit', sans-serif;">
+              Campus Lost and Found
+            </p>
+            <p class="text-cyan-600 text-xs font-medium">Your Items, Reunited</p>
+          </div>
+        </div>
+        <div class="flex-1 flex justify-center">
+          <img src="assets/WhatsApp_Image_2026-06-01_at_11.03.14_AM.jpeg" alt="Campus Lost and Found" class="h-10 object-contain" />
+        </div>
+        <div class="flex items-center gap-3">
+          <button
+            *ngIf="!isLoggedIn()"
+            (click)="navigateToLogin()"
+            class="px-5 py-2 rounded-lg text-sm font-medium bg-cyan-600 text-white hover:bg-cyan-700 transition-all shadow-md hover:shadow-lg"
+            style="font-family: 'DM Sans', sans-serif;"
+          >
+            Login
+          </button>
+          <button
+            *ngIf="isLoggedIn()"
+            (click)="navigateToDashboard()"
+            class="px-5 py-2 rounded-lg text-sm font-medium bg-gradient-to-r from-cyan-600 to-teal-600 text-white hover:from-cyan-700 hover:to-teal-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+            style="font-family: 'DM Sans', sans-serif;"
+          >
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            Dashboard
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero content -->
+    <div class="relative flex-1 flex items-center">
+      <div class="max-w-6xl mx-auto w-full px-6 py-10 flex flex-col gap-10">
+
+        <!-- Headline -->
+        <div class="flex flex-col md:flex-row items-center gap-12">
+          <div class="flex-1">
+            <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-4" style="font-family: 'Outfit', sans-serif;">
+              Lost Something?
+              <br />
+              <span class="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                We've Got You Covered.
+              </span>
+            </h1>
+            <p class="text-slate-500 text-base max-w-md" style="font-family: 'DM Sans', sans-serif;">
+              Browse all lost and found items reported across campus. Reuniting students with their belongings.
+            </p>
+            <div class="mt-6 flex flex-wrap items-center gap-4">
+              <button
+                (click)="navigateToFoundBrowse()"
+                class="px-6 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-cyan-600 to-teal-600 text-white hover:from-cyan-700 hover:to-teal-700 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/30 flex items-center gap-2 group/btn animate-pulse"
+                style="font-family: 'DM Sans', sans-serif;"
+              >
+                <span>Browse Items</span>
+                <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Campus Overview Stats -->
+          <div class="w-full md:w-auto md:flex-1">
+            <div class="flex items-center gap-4 mb-4">
+              <h2 class="text-base font-bold text-slate-900 shrink-0" style="font-family: 'Outfit', sans-serif;">
+                Campus Overview
+              </h2>
+              <div class="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
+              <span class="text-slate-400 text-xs shrink-0" style="font-family: 'DM Sans', sans-serif;">Live statistics</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <!-- All reported -->
+              <div class="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+                <div class="relative shrink-0 w-[56px] h-[56px]">
+                  <svg width="56" height="56" style="transform: rotate(-90deg)">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#e2e8f0" stroke-width="4.5" />
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#0891b2" stroke-width="4.5"
+                      [attr.stroke-dasharray]="getDashArray(100)" stroke-linecap="round" />
+                  </svg>
+                  <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#0891b2]" style="font-family: 'DM Sans', sans-serif">
+                    ALL
+                  </span>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-slate-900" style="font-family: 'Outfit', sans-serif;">{{ stats.total }}</p>
+                  <p class="text-xs font-semibold text-slate-700" style="font-family: 'DM Sans', sans-serif;">Total Reported</p>
+                </div>
+              </div>
+
+              <!-- Lost Items -->
+              <div class="bg-white border border-amber-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+                <div class="relative shrink-0 w-[56px] h-[56px]">
+                  <svg width="56" height="56" style="transform: rotate(-90deg)">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#e2e8f0" stroke-width="4.5" />
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#f59e0b" stroke-width="4.5"
+                      [attr.stroke-dasharray]="getDashArray(stats.lostPercentage)" stroke-linecap="round" />
+                  </svg>
+                  <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#f59e0b]" style="font-family: 'DM Sans', sans-serif">
+                    {{ stats.lostPercentage }}%
+                  </span>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-slate-900" style="font-family: 'Outfit', sans-serif;">{{ stats.lost }}</p>
+                  <p class="text-xs font-semibold text-amber-500" style="font-family: 'DM Sans', sans-serif;">Lost Items</p>
+                </div>
+              </div>
+
+              <!-- Found Items -->
+              <div class="bg-white border border-emerald-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+                <div class="relative shrink-0 w-[56px] h-[56px]">
+                  <svg width="56" height="56" style="transform: rotate(-90deg)">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#e2e8f0" stroke-width="4.5" />
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#10b981" stroke-width="4.5"
+                      [attr.stroke-dasharray]="getDashArray(stats.foundPercentage)" stroke-linecap="round" />
+                  </svg>
+                  <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#10b981]" style="font-family: 'DM Sans', sans-serif">
+                    {{ stats.foundPercentage }}%
+                  </span>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-slate-900" style="font-family: 'Outfit', sans-serif;">{{ stats.found }}</p>
+                  <p class="text-xs font-semibold text-emerald-500" style="font-family: 'DM Sans', sans-serif;">Found Items</p>
+                </div>
+              </div>
+
+              <!-- Returned -->
+              <div class="bg-white border border-violet-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+                <div class="relative shrink-0 w-[56px] h-[56px]">
+                  <svg width="56" height="56" style="transform: rotate(-90deg)">
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#e2e8f0" stroke-width="4.5" />
+                    <circle cx="28" cy="28" r="22" fill="none" stroke="#8b5cf6" stroke-width="4.5"
+                      [attr.stroke-dasharray]="getDashArray(stats.returnRate)" stroke-linecap="round" />
+                  </svg>
+                  <span class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#8b5cf6]" style="font-family: 'DM Sans', sans-serif">
+                    {{ stats.returnRate }}%
+                  </span>
+                </div>
+                <div>
+                  <p class="text-2xl font-bold text-slate-900" style="font-family: 'Outfit', sans-serif;">{{ stats.returned }}</p>
+                  <p class="text-xs font-semibold text-violet-500" style="font-family: 'DM Sans', sans-serif;">Returned</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="relative shrink-0 pb-6 flex justify-center">
+      <button
+        (click)="scrollToSection('details')"
+        class="flex flex-col items-center gap-1 text-slate-400 hover:text-cyan-600 transition-colors"
+      >
+        <span class="text-xs" style="font-family: 'DM Sans', sans-serif;">More Details</span>
+        <svg class="w-[18px] h-[18px] animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    </div>
+
+  </section>
+
+  <!-- ── SECTION 2 — Browse card + How It Works ─────────────────── -->
+  <section id="details" class="min-h-screen bg-slate-50 border-t border-slate-200" style="scroll-snap-align: start;">
+    <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col gap-10">
+      
+      <!-- Browse card -->
+      <div>
+        <button
+          (click)="navigateToFoundBrowse()"
+          class="group relative w-full overflow-hidden bg-white rounded-2xl border border-gray-200 p-10 hover:border-cyan-300 hover:shadow-2xl transition-all duration-300 text-left"
+        >
+          <div class="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-orange-300 to-orange-400 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          <div class="absolute bottom-0 right-0 w-64 h-64 bg-gradient-to-br from-green-300 to-emerald-400 rounded-full blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+          
+          <div class="relative flex flex-col md:flex-row md:items-center gap-8">
+            <div class="flex items-center gap-4">
+              <!-- Warning icon representing Lost -->
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center shadow-lg">
+                <svg class="text-white w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <!-- Package icon representing Found -->
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+                <svg class="text-white w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+            </div>
+            
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold text-gray-900 mb-1" style="font-family: 'Outfit', sans-serif;">
+                Lost &amp; Found Items
+              </h3>
+              <p class="text-gray-500 text-sm" style="font-family: 'DM Sans', sans-serif;">
+                Browse all items reported across campus in one place.
+              </p>
+            </div>
+            
+            <div class="flex items-center gap-2 text-cyan-600 font-semibold text-base group-hover:gap-3 transition-all duration-200 shrink-0">
+              <span>Browse All Items</span>
+              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      <!-- How It Works -->
+      <div>
+        <div class="flex items-center gap-4 mb-5">
+          <h2 class="text-xl font-bold text-slate-900 shrink-0" style="font-family: 'Outfit', sans-serif;">
+            How It Works
+          </h2>
+          <div class="flex-1 h-px bg-gradient-to-r from-slate-200 to-transparent"></div>
+          <span class="text-slate-400 text-sm shrink-0" style="font-family: 'DM Sans', sans-serif;">3 simple steps</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Step 1 -->
+          <div class="relative flex flex-col bg-gradient-to-br from-cyan-50 to-teal-50 rounded-2xl p-5 border border-cyan-100 shadow-sm overflow-hidden">
+            <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-cyan-500 to-teal-600 opacity-10 rounded-full"></div>
+            <div class="relative flex items-start gap-4 mb-3">
+              <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-cyan-500 to-teal-600 flex items-center justify-center shadow-lg text-white">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/70 text-slate-500 border border-slate-200 mb-1 inline-block">
+                  STEP 01
+                </span>
+                <h3 class="text-base font-bold text-gray-900 leading-tight" style="font-family: 'Outfit', sans-serif;">
+                  Search &amp; Browse
+                </h3>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed" style="font-family: 'DM Sans', sans-serif;">
+              Explore our database of lost and found items. Filter by location, date, and category.
+            </p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="relative flex flex-col bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-5 border border-emerald-100 shadow-sm overflow-hidden">
+            <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-emerald-500 to-green-600 opacity-10 rounded-full"></div>
+            <div class="relative flex items-start gap-4 mb-3">
+              <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg text-white">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/70 text-slate-500 border border-slate-200 mb-1 inline-block">
+                  STEP 02
+                </span>
+                <h3 class="text-base font-bold text-gray-900 leading-tight" style="font-family: 'Outfit', sans-serif;">
+                  Locate Collection Point
+                </h3>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed" style="font-family: 'DM Sans', sans-serif;">
+              Each item shows exactly where it's stored — Security Office, Admin Block, Library, and more.
+            </p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="relative flex flex-col bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-100 shadow-sm overflow-hidden">
+            <div class="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-amber-500 to-orange-500 opacity-10 rounded-full"></div>
+            <div class="relative flex items-start gap-4 mb-3">
+              <div class="w-12 h-12 shrink-0 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-lg text-white">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/70 text-slate-500 border border-slate-200 mb-1 inline-block">
+                  STEP 03
+                </span>
+                <h3 class="text-base font-bold text-gray-900 leading-tight" style="font-family: 'Outfit', sans-serif;">
+                  Collect Your Item
+                </h3>
+              </div>
+            </div>
+            <p class="text-gray-600 text-sm leading-relaxed" style="font-family: 'DM Sans', sans-serif;">
+              Bring your student ID to the designated office to verify ownership and collect your item.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policy notice -->
+      <div class="pb-4">
+        <div class="rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-orange-50 px-7 py-6 shadow-md">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center shadow-md shrink-0">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M9 7h2v2H9V7zm0 4h2v4H9v-4zm1-9C5.03 2 2 5.03 2 10s3.03 8 8 8 8-3.03 8-8-3.03-8-8-8zm0 14.4A6.4 6.4 0 1 1 10 3.6a6.4 6.4 0 0 1 0 12.8z" fill="white"/>
+              </svg>
+            </div>
+            <p class="text-sm font-bold text-amber-700 uppercase tracking-widest" style="font-family: 'DM Sans', sans-serif;">
+              University Policy
+            </p>
+          </div>
+          <p class="text-sm text-amber-900 leading-relaxed" style="font-family: 'DM Sans', sans-serif;">
+            If an item remains unclaimed after <span class="font-bold text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-md">60 days</span>, it may be donated, recycled, disposed of, or otherwise handled in accordance with university policies and guidelines.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>

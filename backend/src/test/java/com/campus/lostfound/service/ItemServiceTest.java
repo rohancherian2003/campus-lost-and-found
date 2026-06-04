@@ -28,7 +28,7 @@ public class ItemServiceTest {
                 .thenReturn(Future.succeededFuture(0L));
 
         // Trigger search
-        itemService.getLostItems(1, 10, searchInput, null, null);
+        itemService.getLostItems(1, 10, searchInput, null, null, null, null);
 
         // Verify query building
         JsonObject query = queryCaptor.getValue();
@@ -55,7 +55,7 @@ public class ItemServiceTest {
                 .thenReturn(Future.succeededFuture(0L));
 
         // Trigger location query
-        itemService.getLostItems(1, 10, null, locationInput, null);
+        itemService.getLostItems(1, 10, null, locationInput, null, null, null);
 
         // Verify query building
         JsonObject query = queryCaptor.getValue();

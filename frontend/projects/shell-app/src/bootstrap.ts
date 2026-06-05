@@ -10,12 +10,6 @@ fetch('./assets/config.json')
     if (runtimeConfig.apiUrl) {
       environment.apiUrl = runtimeConfig.apiUrl;
     }
-    if (runtimeConfig.remotes) {
-      environment.remotes = {
-        ...environment.remotes,
-        ...runtimeConfig.remotes
-      };
-    }
     bootstrapApplication(AppComponent, appConfig)
       .catch(err => console.error(err));
   })

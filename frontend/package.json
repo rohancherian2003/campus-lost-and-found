@@ -5,10 +5,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "npm run build:prod",
-    "build:prod": "ng build design-system && ng build shared-lib && ng build shell-app --configuration=production && ng build auth-app --configuration=production && ng build dashboard-app --configuration=production && ng build lost-items-app --configuration=production && ng build found-items-app --configuration=production && mkdir -p dist/shell-app/auth-app dist/shell-app/dashboard-app dist/shell-app/lost-items-app dist/shell-app/found-items-app && cp -r dist/auth-app/* dist/shell-app/auth-app/ && cp -r dist/dashboard-app/* dist/shell-app/dashboard-app/ && cp -r dist/lost-items-app/* dist/shell-app/lost-items-app/ && cp -r dist/found-items-app/* dist/shell-app/found-items-app/",
+    "build:prod": "ng build design-system && ng build shared-lib && ng build shell-app --configuration=production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "run:all": "node node_modules/@angular-architects/module-federation/src/server/mf-dev-server.js"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {

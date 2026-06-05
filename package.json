@@ -6,7 +6,8 @@
   "scripts": {
     "build": "vite build",
     "build:prod": "cd frontend && npm install && npm run build:prod && cd .. && rm -rf dist shell-app && cp -r frontend/dist/shell-app dist && cp -r frontend/dist/shell-app shell-app",
-    "dev": "vite"
+    "dev": "vite",
+    "dev:frontend": "cd frontend && npm start"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

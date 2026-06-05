@@ -4,6 +4,7 @@
 
 export * from './lib/models';
 export * from './lib/services/auth.service';
+export * from './lib/services/api-url.token';
 export * from './lib/services/item.service';
 export * from './lib/services/date-util.service';
 export * from './lib/guards/auth.guard';

@@ -1,0 +1,6 @@
+{
+  "HTTP_PORT": 8080,
+  "MONGO_URI": "mongodb://qa-mongodb:27017",
+  "MONGO_DATABASE": "campus_lost_found_qa",
+  "CORS_ORIGIN": "https://campus-lost-and-found-qa.vercel.app"
+}

@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build shell-app",
+    "build:prod": "ng build shell-app --configuration=production && ng build auth-app --configuration=production && ng build dashboard-app --configuration=production && ng build lost-items-app --configuration=production && ng build found-items-app --configuration=production && mkdir -p dist/shell-app/auth-app dist/shell-app/dashboard-app dist/shell-app/lost-items-app dist/shell-app/found-items-app && cp -r dist/auth-app/* dist/shell-app/auth-app/ && cp -r dist/dashboard-app/* dist/shell-app/dashboard-app/ && cp -r dist/lost-items-app/* dist/shell-app/lost-items-app/ && cp -r dist/found-items-app/* dist/shell-app/found-items-app/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "run:all": "node node_modules/@angular-architects/module-federation/src/server/mf-dev-server.js"
@@ -28,7 +29,6 @@
     "@angular-devkit/build-angular": "^16.0.6",
     "@angular/cli": "~16.0.2",
     "@angular/compiler-cli": "^16.0.0",
-    "@lucide/angular": "^1.17.0",
     "@types/jasmine": "~4.3.0",
     "autoprefixer": "^10.5.0",
     "jasmine-core": "~4.6.0",

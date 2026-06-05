@@ -1,16 +1,18 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Item, Category, DisposedRecord, OverviewStats, CountdownStats } from '../models';
+import { API_URL } from './api-url.token';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ItemService {
-  private apiUrl = 'http://localhost:8080/api';
-
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(API_URL) private apiUrl: string
+  ) {}
 
   private buildParams(filters: any): HttpParams {
     let params = new HttpParams();

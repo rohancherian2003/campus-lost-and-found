@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { loadRemoteModule } from '@angular-architects/module-federation';
 import { AuthGuard, NoAuthGuard } from 'shared-lib';
+import { environment } from '../environments/environment';
 
 export const routes: Routes = [
   {
@@ -21,7 +22,7 @@ export const routes: Routes = [
     canActivate: [NoAuthGuard],
     loadComponent: () => loadRemoteModule({
       type: 'module',
-      remoteEntry: 'http://localhost:4201/remoteEntry.js',
+      remoteEntry: environment.remotes.authApp,
       exposedModule: './Component'
     }).then(m => m.AppComponent)
   },
@@ -39,7 +40,7 @@ export const routes: Routes = [
         path: 'lost-items',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4203/remoteEntry.js',
+          remoteEntry: environment.remotes.lostItemsApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       },
@@ -47,7 +48,7 @@ export const routes: Routes = [
         path: 'found-items',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4204/remoteEntry.js',
+          remoteEntry: environment.remotes.foundItemsApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       },
@@ -55,7 +56,7 @@ export const routes: Routes = [
         path: 'expired-items',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4204/remoteEntry.js',
+          remoteEntry: environment.remotes.foundItemsApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       },
@@ -68,7 +69,7 @@ export const routes: Routes = [
         path: 'reports',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4204/remoteEntry.js',
+          remoteEntry: environment.remotes.foundItemsApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       },
@@ -76,7 +77,7 @@ export const routes: Routes = [
         path: 'history',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4202/remoteEntry.js',
+          remoteEntry: environment.remotes.dashboardApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       },
@@ -84,7 +85,7 @@ export const routes: Routes = [
         path: 'guidelines',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4202/remoteEntry.js',
+          remoteEntry: environment.remotes.dashboardApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       },
@@ -92,7 +93,7 @@ export const routes: Routes = [
         path: 'settings',
         loadComponent: () => loadRemoteModule({
           type: 'module',
-          remoteEntry: 'http://localhost:4202/remoteEntry.js',
+          remoteEntry: environment.remotes.dashboardApp,
           exposedModule: './Component'
         }).then(m => m.AppComponent)
       }

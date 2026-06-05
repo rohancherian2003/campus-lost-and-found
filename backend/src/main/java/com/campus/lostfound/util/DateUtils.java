@@ -98,8 +98,8 @@ public final class DateUtils {
     public static boolean isFutureDate(String dateStr) {
         Instant parsed = parseDate(dateStr);
         if (parsed == null) return false;
-        java.time.LocalDate inputDate = parsed.atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-        java.time.LocalDate today = java.time.LocalDate.now(java.time.ZoneId.systemDefault());
-        return inputDate.isAfter(today);
+        java.time.LocalDate inputDate = parsed.atZone(java.time.ZoneId.of("UTC")).toLocalDate();
+        java.time.LocalDate today = java.time.LocalDate.now(java.time.ZoneId.of("UTC"));
+        return inputDate.isAfter(today.plusDays(1));
     }
 }

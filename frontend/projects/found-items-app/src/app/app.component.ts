@@ -86,6 +86,7 @@ export class AppComponent implements OnInit, OnDestroy {
     date: '',
     collectFrom: '',
     description: '',
+    category: '',
     image: '',
     studentName: '',
     rollNo: '',
@@ -429,7 +430,7 @@ export class AppComponent implements OnInit, OnDestroy {
   resetReportForm(): void {
     this.reportSubmitted = false;
     this.reportForm = {
-      name: '', location: '', date: '', collectFrom: '', description: '', image: '',
+      name: '', location: '', date: '', collectFrom: '', description: '', category: '', image: '',
       studentName: '', rollNo: '', phone: '', email: '',
       staffName: '', employeeId: '', department: '', staffPhone: '', staffEmail: ''
     };
@@ -449,6 +450,7 @@ export class AppComponent implements OnInit, OnDestroy {
       location: this.reportForm.location,
       date: this.dateUtil.toUtcIsoString(this.reportForm.date),
       description: this.reportForm.description,
+      category: this.reportForm.category,
       image: this.reportForm.image || '',
       contactType: this.reportContactType
     };

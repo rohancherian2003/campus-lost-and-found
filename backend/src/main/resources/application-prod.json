@@ -1,0 +1,6 @@
+{
+  "HTTP_PORT": 8080,
+  "MONGO_URI": "mongodb://mongodb:27017",
+  "MONGO_DATABASE": "campus_lost_found",
+  "CORS_ORIGIN": "https://campus-lost-and-found-rohancherian2003s-projects.vercel.app"
+}

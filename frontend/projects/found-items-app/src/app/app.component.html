@@ -521,7 +521,7 @@
           <!-- Category Selection -->
           <div>
             <label class="text-gray-700 text-xs font-medium block mb-1.5" style="font-family: 'DM Sans', sans-serif">Category *</label>
-            <select required [(ngModel)]="reportForm.image" name="category" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 appearance-none cursor-pointer">
+            <select required [(ngModel)]="reportForm.category" name="category" class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 appearance-none cursor-pointer">
               <option value="" disabled>Select a category</option>
               <option *ngFor="let cat of categories" [value]="cat.name">{{ cat.name }}</option>
             </select>

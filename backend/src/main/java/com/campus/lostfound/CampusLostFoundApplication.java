@@ -103,8 +103,8 @@ public class CampusLostFoundApplication extends AbstractVerticle {
         logger.info("Starting Campus Lost & Found backend verticle...");
         
         try {
-            validateAdminSeedPassword(System.getenv("ADMIN_SEED_PASSWORD"));
-            this.adminSeedPassword = System.getenv("ADMIN_SEED_PASSWORD");
+            validateAdminSeedPassword(AppConfig.getEnv("ADMIN_SEED_PASSWORD"));
+            this.adminSeedPassword = AppConfig.getEnv("ADMIN_SEED_PASSWORD");
         } catch (Exception e) {
             logger.error("Startup validation failed: {}", e.getMessage());
             startPromise.fail(e);
@@ -302,12 +302,25 @@ public class CampusLostFoundApplication extends AbstractVerticle {
             ctx.next();
         });
 
-        // Enable CORS using configured origin + development fallbacks
-        CorsHandler corsHandler = CorsHandler.create()
-                .addOrigin(appConfig.getCorsOrigin())
-                .addOrigin("http://localhost:5173")
-                .addOrigin("http://localhost:4200")
-                .addOrigin("http://localhost:3000")
+        // Enable CORS using configured origin pattern + development fallbacks
+        StringBuilder patternBuilder = new StringBuilder();
+        patternBuilder.append("^(http://localhost:\\d+|http://127.0.0.1:\\d+|https://.*\\.vercel\\.app|https://.*\\.onrender\\.com");
+        
+        String corsOriginConf = appConfig.getCorsOrigin();
+        if (corsOriginConf != null) {
+            for (String origin : corsOriginConf.split(",")) {
+                String trimmed = origin.trim();
+                if (!trimmed.isEmpty()) {
+                    String escaped = trimmed.replace(".", "\\.").replace(":", "\\:");
+                    patternBuilder.append("|").append(escaped);
+                }
+            }
+        }
+        patternBuilder.append(")$");
+        String allowedOriginPattern = patternBuilder.toString();
+        logger.info("Configuring CORS with pattern: {}", allowedOriginPattern);
+
+        CorsHandler corsHandler = CorsHandler.create(allowedOriginPattern)
                 .allowedMethod(HttpMethod.GET)
                 .allowedMethod(HttpMethod.POST)
                 .allowedMethod(HttpMethod.PUT)
@@ -335,6 +348,11 @@ public class CampusLostFoundApplication extends AbstractVerticle {
     }
 
     private void registerRoutes(Router router) {
+        // Root and Health Check APIs
+        router.get("/").handler(this::handleRoot);
+        router.get("/api").handler(this::handleRoot);
+        router.get("/api/").handler(this::handleRoot);
+
         // Public API
         router.post("/api/auth/login").handler(this::handleLogin);
         router.post("/api/auth/refresh").handler(this::handleRefresh);
@@ -379,6 +397,13 @@ public class CampusLostFoundApplication extends AbstractVerticle {
         // Stats
         router.get("/api/admin/stats/overview").handler(this::handleGetStatsOverview);
         router.get("/api/admin/stats/countdown").handler(this::handleGetStatsCountdown);
+    }
+
+    private void handleRoot(RoutingContext ctx) {
+        JsonObject statusInfo = new JsonObject()
+                .put("status", "UP")
+                .put("timestamp", Instant.now().toString());
+        sendResponse(ctx, 200, ApiResponse.ok("Campus Lost and Found API Server is running", statusInfo));
     }
 
     private void handleLogin(RoutingContext ctx) {

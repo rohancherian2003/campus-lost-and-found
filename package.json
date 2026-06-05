@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "build:prod": "cd frontend && npm install && npm run build:prod && cd .. && rm -rf dist && cp -r frontend/dist/shell-app dist",
     "dev": "vite"
   },
   "dependencies": {

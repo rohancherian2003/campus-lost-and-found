@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build shell-app",
+    "build": "npm run build:prod",
     "build:prod": "ng build shell-app --configuration=production && ng build auth-app --configuration=production && ng build dashboard-app --configuration=production && ng build lost-items-app --configuration=production && ng build found-items-app --configuration=production && mkdir -p dist/shell-app/auth-app dist/shell-app/dashboard-app dist/shell-app/lost-items-app dist/shell-app/found-items-app && cp -r dist/auth-app/* dist/shell-app/auth-app/ && cp -r dist/dashboard-app/* dist/shell-app/dashboard-app/ && cp -r dist/lost-items-app/* dist/shell-app/lost-items-app/ && cp -r dist/found-items-app/* dist/shell-app/found-items-app/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
